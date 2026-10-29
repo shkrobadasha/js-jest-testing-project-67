@@ -13,16 +13,41 @@
 
 ## Установка
 
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
-
 ```bash
 git clone https://github.com/shkrobadasha/js-jest-testing-project-67.git
 cd js-jest-testing-project-67
+npm install
 ```
 
 ## Использование
 
-<!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
+### CLI
+
+```bash
+bin/page-loader.js --output /var/tmp https://ru.hexlet.io/courses
+# /var/tmp/ru-hexlet-io-courses.html
+```
+
+Опция `--output` (`-o`) задаёт директорию для сохранения файла. По умолчанию файл сохраняется в текущую директорию.
+
+### Как библиотека
+
+```js
+import pageLoader from '@hexlet/code';
+
+const { filepath } = await pageLoader('https://ru.hexlet.io/courses', '/var/tmp');
+// '/var/tmp/ru-hexlet-io-courses.html'
+```
+
+### Тесты
+
+```bash
+npx vitest run
+```
+
+### Пример работы (asciinema)
+
+<!-- TODO: вставьте ссылку на запись asciinema -->
 
 ---
 

@@ -1,0 +1,37 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "Тестирование загрузчика страниц (JS, Hexlet)",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "page-loader": "bin/page-loader.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "hexlet",
+    "vitest",
+    "testing",
+    "page-loader"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
+    "nock": "^15.0.5",
+    "prettier": "^3.9.10",
+    "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "axios": "^1.21.0",
+    "commander": "^15.0.0"
+  }
+}
