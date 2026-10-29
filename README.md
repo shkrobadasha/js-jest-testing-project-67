@@ -45,10 +45,6 @@ const { filepath } = await pageLoader('https://ru.hexlet.io/courses', '/var/tmp'
 npx vitest run
 ```
 
-### Пример работы (asciinema)
-
-<!-- TODO: вставьте ссылку на запись asciinema -->
-
 ---
 
 <details>

@@ -13,34 +13,33 @@ const getResourceDirName = (url) => getFileName(url).replace(/\.html$/, '_files'
 const getAssetFileName = (assetUrl) => {
   const { hostname, pathname } = new URL(assetUrl);
   const ext = path.extname(pathname);
-  const stem = `${hostname}${pathname.slice(0, -ext.length)}`.replace(
-    /[^a-zA-Z0-9]/g,
-    '-',
-  );
-  return `${stem}${ext}`;
+  const stemPart = ext ? pathname.slice(0, -ext.length) : pathname;
+  const stem = `${hostname}${stemPart}`.replace(/[^a-zA-Z0-9]/g, '-');
+  return `${stem}${ext || '.html'}`;
 };
 
-const getBaseDomain = (hostname) => {
-  const parts = hostname.split('.');
-  return parts.length > 2 ? parts.slice(1).join('.') : hostname;
-};
-
-const isLocalResource = (pageUrl, assetUrl) => {
-  const pageHost = new URL(pageUrl).hostname;
-  const assetHost = new URL(assetUrl).hostname;
-  const baseDomain = getBaseDomain(pageHost);
-  return (
-    assetHost === pageHost
-    || assetHost === baseDomain
-    || assetHost.endsWith(`.${baseDomain}`)
-  );
-};
+const isLocalResource = (pageUrl, assetUrl) =>
+  new URL(pageUrl).hostname === new URL(assetUrl).hostname;
 
 const downloadResource = async (assetUrl, output, dirName) => {
   const filename = getAssetFileName(assetUrl);
   const { data } = await axios.get(assetUrl, { responseType: 'arraybuffer' });
   await fs.writeFile(path.join(output, dirName, filename), Buffer.from(data));
   return filename;
+};
+
+const processResources = ($, selector, attr, url, output, dirName, promises) => {
+  $(selector).each((_, element) => {
+    const value = $(element).attr(attr);
+    if (!value || value.startsWith('data:')) return;
+    const absoluteUrl = new URL(value, url).href;
+    if (!isLocalResource(url, absoluteUrl)) return;
+    promises.push(
+      downloadResource(absoluteUrl, output, dirName).then((filename) => {
+        $(element).attr(attr, `${dirName}/${filename}`);
+      }),
+    );
+  });
 };
 
 export default async function pageLoader(url, output) {
@@ -50,17 +49,9 @@ export default async function pageLoader(url, output) {
   const dirName = getResourceDirName(url);
   const assetPromises = [];
 
-  $('img[src]').each((_, element) => {
-    const src = $(element).attr('src');
-    if (!src || src.startsWith('data:')) return;
-    const absoluteUrl = new URL(src, url).href;
-    if (!isLocalResource(url, absoluteUrl)) return;
-    assetPromises.push(
-      downloadResource(absoluteUrl, output, dirName).then((filename) => {
-        $(element).attr('src', `${dirName}/${filename}`);
-      }),
-    );
-  });
+  processResources($, 'img[src]', 'src', url, output, dirName, assetPromises);
+  processResources($, 'script[src]', 'src', url, output, dirName, assetPromises);
+  processResources($, 'link[href]', 'href', url, output, dirName, assetPromises);
 
   if (assetPromises.length > 0) {
     await fs.mkdir(path.join(output, dirName), { recursive: true });
