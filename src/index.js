@@ -98,7 +98,7 @@ const processResources = (
   })
 }
 
-export default async function pageLoader(url, output) {
+export default async function pageLoader(url, output = process.cwd()) {
   log('Загрузка страницы %s в %s', url, output)
   const { data } = await load(url)
   log('Страница загружена, размер %d байт', data.length)
